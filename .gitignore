@@ -403,3 +403,4 @@ FodyWeavers.xsd
 
 #KOMPAS API files
 Common/
+*.csv
