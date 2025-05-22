@@ -14,7 +14,7 @@
 
         public SpecItem(string position, string name, string count, string commentary)
         {
-            this.RawPosition = rawPosition?.Trim() ?? throw new ArgumentNullException(nameof(rawPosition));
+            this.RawPosition = position?.Trim() ?? throw new ArgumentNullException(nameof(position));
             this.Name = name;
             this.Count = count;
             this.Commentary = commentary;
