@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Профиль 1": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\yonett\\source\\repos\\Yonett\\CSVtoSPW\\bin\\Debug\\net8.0\\CSVtoSPW.exe"
+    }
+  }
+}

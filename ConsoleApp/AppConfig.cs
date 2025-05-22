@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace CSVtoSPW.ConsoleApp
 {
@@ -11,11 +10,8 @@ namespace CSVtoSPW.ConsoleApp
         public string TemplateLytPath { get; set; }
 
         // Настройки формата
-        public char CsvDelimiter { get; set; } = ';';
+        public string CsvDelimiter { get; set; } = ";";
         public int LineControlSize { get; set; } = 8;
-
-        // Группировка
-        public Dictionary<string, (string Name, string Comment)> GroupMappings { get; set; }
 
         /// <summary> Загружает конфиг из JSON-файла </summary>
         public static AppConfig Load(string filePath)

@@ -1,4 +1,6 @@
-﻿namespace CSVtoSPW.Core.Models
+﻿using System.Text;
+
+namespace CSVtoSPW.Core.Models
 {
     public class SpecItem
     {
@@ -34,7 +36,7 @@
         private int[] ParseNumbers()
         {
             var numbers = new List<int>();
-            foreach (var part in RawPosition.Split(','))
+            foreach (var part in RawPosition.Split(", "))
             {
                 string numStr = part[GroupPrefix.Length..];
                 if (int.TryParse(numStr, out int num))
@@ -84,7 +86,7 @@
             if (string.IsNullOrEmpty(FormattedPosition))
                 return;
 
-            var parts = FormattedPosition.Split(',');
+            var parts = FormattedPosition.Split(", ");
             var newText = new StringBuilder();
             int currentLength = 0;
 

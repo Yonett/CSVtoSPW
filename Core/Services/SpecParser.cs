@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using CSVtoSPW.Core.Models;
 
-namespace CSVtoSPW.Data.Parsers
+namespace CSVtoSPW.Core.Services
 {
     public static class SpecParser
     {

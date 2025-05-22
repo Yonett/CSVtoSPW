@@ -1,19 +1,15 @@
 ﻿using CSVtoSPW.Core.Models;
-using CSVtoSPW.Core.Interfaces;
+using CSVtoSPW.Core.Services;
 using Kompas6API5;
 using Kompas6Constants;
 using KAPITypes;
-using System;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace CSVtoSPW.KOMPASIntegration
 {
-    public class KOMPASFacade : IKompasService, IDisposable
+    public class KOMPASFacade : IDisposable
     {
-        private KompasObject _kompas;
-        private ksSpcDocument _activeDocument;
+        private KompasObject? _kompas;
         private bool _isDisposed;
 
         private ksSpcDocument _spcDocument;
@@ -25,15 +21,12 @@ namespace CSVtoSPW.KOMPASIntegration
 
             try
             {
-                _kompas = (KompasObject)Marshal.GetActiveObject("KOMPAS.Application.5");
+                _kompas = (KompasObject)Marshal2.GetActiveObject("KOMPAS.Application.5");
             }
             catch (COMException)
             {
-                _kompas = (KompasObject)Activator.CreateInstance(
-                    Type.GetTypeFromProgID("KOMPAS.Application.5"));
+                _kompas = (KompasObject)Activator.CreateInstance(Type.GetTypeFromProgID("KOMPAS.Application.5"));
             }
-
-            _kompas.Visible = true;
         }
 
         public void CreateSpecification(string layoutPath)
@@ -52,19 +45,18 @@ namespace CSVtoSPW.KOMPASIntegration
             sheetParam.layoutName = layoutPath;
             sheetParam.shtType = 1;
 
-            _activeDocument = (ksSpcDocument)_kompas.SpcDocument();
-            _activeDocument.ksCreateDocument(docParam);
+            _spcDocument = (ksSpcDocument)_kompas.SpcDocument();
+            _spcDocument.ksCreateDocument(docParam);
 
-            _spcDocument = (ksSpcDocument)_activeDocument.GetSpecification();
-            _specification = _spcDocument.GetSpecification();
+            _specification = (ksSpecification)_spcDocument.GetSpecification();
         }
 
         public void AddPosition(SpecItem item)
         {
+            CheckConnection();
             CheckActiveSpecification();
 
-            var objParam = (ksSpcObjParam)_kompas.GetParamStruct(
-                (short)StructType2DEnum.ko_SpcObjParam);
+            var objParam = (ksSpcObjParam)_kompas.GetParamStruct((short)StructType2DEnum.ko_SpcObjParam);
             
             objParam.Init();
             objParam.blockNumber = 0;
@@ -76,7 +68,7 @@ namespace CSVtoSPW.KOMPASIntegration
             _specification.ksSpcObjectEdit(rowId);
             _spcDocument.ksSetObjParam(rowId, objParam, ldefin2d.ALLPARAM);
             
-            _specification.ksSetSpcObjectColumnText(4, 1, 0, item.Position);
+            _specification.ksSetSpcObjectColumnText(4, 1, 0, item.FormattedPosition);
             _specification.ksSetSpcObjectColumnText(5, 1, 0, item.Name);
             _specification.ksSetSpcObjectColumnText(6, 1, 0, item.Count);
             _specification.ksSetSpcObjectColumnText(7, 1, 0, item.Commentary);
@@ -87,7 +79,7 @@ namespace CSVtoSPW.KOMPASIntegration
         public void Save(string filePath)
         {
             CheckActiveSpecification();
-            _activeDocument.ksSaveDocument(filePath);
+            _spcDocument.ksSaveDocument(filePath);
         }
 
         private void CheckConnection()
@@ -108,13 +100,28 @@ namespace CSVtoSPW.KOMPASIntegration
                 throw new FileNotFoundException($"Файл стиля не найден: {path}");
         }
 
+        public void Close()
+        {
+            _spcDocument?.ksCloseDocument();
+            if (_kompas != null)
+            {
+                _kompas.Quit();
+                _kompas = null;
+            }
+        }
+
         public void Dispose()
         {
             if (_isDisposed) return;
 
             try
             {
-                _activeDocument?.ksCloseDocument();
+                _spcDocument?.ksCloseDocument();
+                if (_kompas != null)
+                {
+                    _kompas.Quit();
+                    _kompas = null;
+                }
                 if (_kompas != null)
                 {
                     Marshal.ReleaseComObject(_kompas);

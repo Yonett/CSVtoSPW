@@ -1,8 +1,7 @@
 ﻿using CSVtoSPW.Core.Models;
-using CSVtoSPW.Data.Parsers;
+using CSVtoSPW.Core.Services;
+using CSVtoSPW.Data.Exporters;
 using CSVtoSPW.KOMPASIntegration;
-using System;
-using System.IO;
 
 namespace CSVtoSPW.ConsoleApp
 {
@@ -12,24 +11,20 @@ namespace CSVtoSPW.ConsoleApp
         {
             try
             {
-                // 1. Загрузка конфигурации
                 var config = LoadConfig(args);
-                
-                // 2. Парсинг CSV
-                var parser = new SpecParser(config.CsvDelimiter);
-                List<SpecItem> items = parser.Parse(config.InputCsvPath);
 
-                // 3. Экспорт в KOMPAS
-                using (var exporter = new SpcExporter())
-                {
-                    exporter.Export(
-                        items: items,
-                        outputPath: config.OutputSpwPath,
-                        templatePath: config.TemplateLytPath,
-                        lineControlSize: config.LineControlSize,
-                        groupMappings: config.GroupMappings
-                    );
-                }
+                //KOMPASFacade kompas = new KOMPASFacade();
+                
+                List<SpecItem> items = SpecParser.Parse(config.InputCsvPath, config.CsvDelimiter);
+
+                var exporter = new SPWExporter();
+
+                exporter.Export(
+                    items: items,
+                    outputPath: config.OutputSpwPath,
+                    templatePath: config.TemplateLytPath,
+                    maxLineLength: config.LineControlSize
+                );
 
                 Console.WriteLine($"Спецификация успешно создана: {config.OutputSpwPath}");
                 return 0;
@@ -49,7 +44,6 @@ namespace CSVtoSPW.ConsoleApp
 
         private static AppConfig LoadConfig(string[] args)
         {
-            // Приоритет: аргументы командной строки > config.json
             string configPath = args.Length > 0 ? args[0] : "config.json";
             return AppConfig.Load(configPath);
         }

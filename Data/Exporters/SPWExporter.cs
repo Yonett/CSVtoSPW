@@ -1,36 +1,36 @@
 ﻿using CSVtoSPW.Core.Models;
-using CSVtoSPW.Core.Interfaces;
 using CSVtoSPW.KOMPASIntegration;
-using System;
-using System.Collections.Generic;
 
 namespace CSVtoSPW.Data.Exporters
 {
     public class SPWExporter
     {
-        private readonly IKompasService _kompasService;
+        private readonly KOMPASFacade _kompas;
 
-        public SPWExporter(IKompasService kompasService)
+        public SPWExporter(KOMPASFacade kompas)
         {
-            _kompasService = kompasService;
+            _kompas = kompas;
         }
 
         public SPWExporter() : this(new KOMPASFacade()) { }
 
 
-        public void Export(List<SpecItem> items, string outputPath, string templatePath)
+        public void Export(List<SpecItem> items, string outputPath, string templatePath, int maxLineLength)
         {
             try
             {
-                _kompasService.Connect();
-                _kompasService.CreateSpecification(templatePath);
+                _kompas.Connect();
+                _kompas.CreateSpecification(templatePath);
 
                 foreach (var item in items)
                 {
-                    _kompasService.AddPosition(item);
+                    item.FormatPosition();
+                    item.AddLineBreaks(maxLineLength);
+                    _kompas.AddPosition(item);
                 }
 
-                _kompasService.Save(outputPath);
+                _kompas.Save(outputPath);
+                _kompas.Close();
             }
             catch (Exception ex)
             {
