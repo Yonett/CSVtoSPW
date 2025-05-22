@@ -1,7 +1,7 @@
 {
-    "InputCsvPath": "input.csv",
-    "OutputSpwPath": "C:\\Users\\yonett\\Desktop\\output.spw",
+    "InputCsvPath": "C:\\Users\\grushev\\Desktop\\target.csv",
+    "OutputSpwPath": "C:\\Users\\grushev\\Desktop\\target.spw",
     "TemplateLytPath": "C:\\Program Files\\ASCON\\KOMPAS-3D v17\\Sys\\ke.lyt",
     "CsvDelimiter": ";",
-    "LineControlSize": 10
+    "LineControlSize": 8
 }

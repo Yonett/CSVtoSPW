@@ -3,7 +3,7 @@ using CSVtoSPW.KOMPASIntegration;
 
 namespace CSVtoSPW.Data.Exporters
 {
-    public class SPWExporter
+    public class SPWExporter : IDisposable
     {
         private readonly KOMPASFacade _kompas;
 
@@ -30,12 +30,16 @@ namespace CSVtoSPW.Data.Exporters
                 }
 
                 _kompas.Save(outputPath);
-                _kompas.Close();
             }
             catch (Exception ex)
             {
                 throw new SpcExportException("Ошибка экспорта", ex);
             }
+        }
+
+        public void Dispose()
+        {
+            _kompas.Dispose();
         }
     }
 

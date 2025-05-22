@@ -14,17 +14,18 @@ namespace CSVtoSPW.ConsoleApp
                 var config = LoadConfig(args);
 
                 //KOMPASFacade kompas = new KOMPASFacade();
-                
+
                 List<SpecItem> items = SpecParser.Parse(config.InputCsvPath, config.CsvDelimiter);
 
-                var exporter = new SPWExporter();
-
-                exporter.Export(
-                    items: items,
-                    outputPath: config.OutputSpwPath,
-                    templatePath: config.TemplateLytPath,
-                    maxLineLength: config.LineControlSize
-                );
+                using (var exporter = new SPWExporter())
+                {
+                    exporter.Export(
+                        items: items,
+                        outputPath: config.OutputSpwPath,
+                        templatePath: config.TemplateLytPath,
+                        maxLineLength: config.LineControlSize
+                    );
+                }
 
                 Console.WriteLine($"Спецификация успешно создана: {config.OutputSpwPath}");
                 return 0;
